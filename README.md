@@ -53,7 +53,7 @@ docker run -d \
 1. 拉库命令：
 
     ```
-    ql repo https://github.com/Cp0204/quark-auto-save.git "quark" "" "sendNotify"
+    ql repo https://github.com/zocodo/quark-auto-save.git "quark" "" "sendNotify"
     ```
 
 2. 首次运行程序将从本仓库下载配置模版。
@@ -140,13 +140,6 @@ docker run -d \
 当任务 `pattern` 值为 `$开头` 且 `replace` 留空时，实际将调用程序预设的正则表达式。
 
 如 `$TV` 可适配和自动整理市面上90%分享剧集的文件名格式，具体实现见代码，欢迎贡献规则。
-
-## 打赏
-
-如果这个项目让你受益，你可以打赏我1块钱，让我知道开源有价值。谢谢！
-
-![WeChatPay](img/wechat_pay_qrcode.png)
-
 ## 声明
 
 本程序为个人兴趣开发，开源仅供学习与交流使用。
