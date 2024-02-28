@@ -270,6 +270,42 @@ def rename(fid, file_name):
     ).json()
     return response["data"]
 
+def query_update_list():
+    url = "https://drive-pc.quark.cn/1/clouddrive/share/update_list"
+    querystring = {"pr": "ucpro", "fr": "pc", "uc_param_str": ""}
+    payload = {
+        "page": 1,
+        "needTotalNum": 1,
+        "share_read_statues": [
+            0,
+            1
+        ],
+        "fetch_total": 1,
+        "fetch_max_file_update_pos": 1,
+        "fetch_update_files": 1,
+        "page_size": 100
+    }
+    headers = common_headers()
+    response = requests.request(
+        "POST", url, json=payload, headers=headers, params=querystring
+    ).json()
+    return response["data"]["list"]
+
+def format_sublist(sublist):
+    subtasklist = []
+    for sublistitem in sublist:
+        share_url = f"{sublistitem['share_url']}?read=1&passcode=#/list/share/{sublistitem['first_fid']}-{sublistitem['title']}"
+        subtasklist.append({
+            "taskname": sublistitem["title"],
+            "shareurl": share_url,
+            "savepath": "/动漫",
+            "pattern": "\\.(mp4|mkv)$",
+            "replace": "",
+            "enddate": "",
+            "emby_id": "",
+            "savepath_fid": "2f4287e257c2429ba63f40fbfa10eb86"
+        })
+    return subtasklist
 
 def update_savepath_fid(tasklist):
     dir_paths = [
@@ -297,6 +333,18 @@ def update_savepath_fid(tasklist):
     # print(dir_paths_exist_arr)
 
 
+def del_task(task):
+    url = "https://drive-pc.quark.cn/1/clouddrive/share/update_record/delete"
+    querystring = {"pr": "ucpro", "fr": "pc", "uc_param_str": ""}
+    payload = {
+        "share_ids": task["share_id"]
+    }
+    headers = common_headers()
+    response = requests.request(
+        "POST", url, json=payload, headers=headers, params=querystring
+    ).json()
+    add_notify(f"订阅: {task['taskname']} 已删除")
+
 def save_task(task):
     # 判断资源失效记录
     if task.get("shareurl_ban"):
@@ -319,6 +367,7 @@ def save_task(task):
     share_file_list = get_detail(pwd_id, stoken, pdir_fid)
     if not share_file_list:
         add_notify(f"《{task['taskname']}》：分享目录为空")
+        del_task(task)
         return
     # print("share_file_list: ", share_file_list)
 
@@ -488,8 +537,13 @@ def do_sign(cookies):
 def do_save():
     print(f"===============转存任务===============")
     print(f"转存账号: {first_account['nickname']}")
-    # 任务列表
-    tasklist = config_data.get("tasklist", [])
+    # 所有的订阅列表
+    sublist = query_update_list()
+    tasklist = format_sublist(sublist)
+    # print(f"所有的订阅列表: {alltasklist}")
+    # 手动填写的任务列表
+    # tasklist = config_data.get("tasklist", [])
+    
     # 获取全部保存目录fid
     if tasklist:
         update_savepath_fid(tasklist)
