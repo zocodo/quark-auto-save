@@ -5,7 +5,7 @@
 # ConfigFile: quark_config.json
 """
 new Env('夸克自动追更');
-0 8,18,20 * * * quark_auto_save.py
+* 0/15 * * * ? quark_auto_save.py
 """
 import os
 import re
